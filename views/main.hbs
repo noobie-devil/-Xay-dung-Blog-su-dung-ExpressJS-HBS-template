@@ -1,0 +1,70 @@
+<!DOCTYPE html
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>My Blog</title>
+    <link rel="stylesheet" href="css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- FontAweome CDN Link for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+  </head>
+  <body>
+    <div class="container post-form">
+      <div class="wrapper">
+        <section class="post">
+          <header>Tạo bài viết</header>
+          <form action="#">
+            <div class="content">
+              <div class="details">
+                <p></p>
+              </div>
+            </div>
+            <textarea placeholder="What's on your mind?" spellcheck="false" required></textarea>
+            <button>Post</button>
+          </form>
+        </section>
+      </div>
+    </div>
+
+    <div class="container single-post">
+      <div class="wrapper" style="float: left;">
+        <section class="post">
+          <header>Bài viết</header>
+          <div class="content">
+            <div class="details">
+              <p>Đây là bài viết đầu tiên</p>
+            </div>
+          </div>
+        </section>
+        <section class="comment">
+          <header>Bình luận</header>
+          <form action="#">
+            <textarea placeholder="Viết bình luận..." spellcheck="false" required></textarea>
+          </form>
+        </section>
+      
+      </div>
+
+      <div style="clear: both;"></div>
+    </div>
+
+
+
+    <script>
+      const container = document.querySelector(".container"),
+      privacy = container.querySelector(".post .privacy"),
+      arrowBack = container.querySelector(".audience .arrow-back");
+
+
+      privacy.addEventListener("click", () => {
+        container.classList.add("active");
+      });
+
+
+      arrowBack.addEventListener("click", () => {
+        container.classList.remove("active");
+      });
+    </script>
+    
+  </body>
+</html>>
