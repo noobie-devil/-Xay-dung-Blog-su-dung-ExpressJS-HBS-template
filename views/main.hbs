@@ -13,7 +13,7 @@
       <div class="wrapper">
         <section class="post">
           <header>Tạo bài viết</header>
-          <form action="#">
+          <form >
             <div class="content">
               <div class="details">
                 <p></p>
@@ -25,9 +25,47 @@
         </section>
       </div>
     </div>
-
-    <div class="container single-post">
+    {{#each posts}}
+    <div id="post-{{@index}}" class="container single-post">
       <div class="wrapper" style="float: left;">
+        <ul class="post-actions">
+            <li style="color: #0051ff;">Chỉnh sửa</li>
+            <li style="color: red;">Xóa</li>
+          </ul>
+        <section class="post">
+          <header>Bài viết</header>
+          <div class="content">
+            <div class="details">
+              <p>{{this.content}}</p>
+            </div>
+          </div>
+        </section>
+        <section class="comment-form">
+          <header>Bình luận</header>
+          <form action="#">
+            <textarea placeholder="Viết bình luận..." spellcheck="false" required></textarea>
+          </form>
+        </section>
+      
+      </div>
+      <div style="clear: both;"></div>
+      {{#if this.comments}}
+      <ul class="comment-list">
+        {{#each this.comments}}
+        <li>{{this}}</li>
+        {{/each}}
+      </ul>
+
+      {{/if}}
+    </div>
+        
+    {{/each}}
+    <!-- <div class="container single-post">
+      <div class="wrapper" style="float: left;">
+        <ul class="post-actions">
+            <li style="color: #0051ff;">Chỉnh sửa</li>
+            <li style="color: red;">Xóa</li>
+          </ul>
         <section class="post">
           <header>Bài viết</header>
           <div class="content">
@@ -36,7 +74,7 @@
             </div>
           </div>
         </section>
-        <section class="comment">
+        <section class="comment-form">
           <header>Bình luận</header>
           <form action="#">
             <textarea placeholder="Viết bình luận..." spellcheck="false" required></textarea>
@@ -44,9 +82,17 @@
         </section>
       
       </div>
-
       <div style="clear: both;"></div>
-    </div>
+
+      <ul class="comment-list">
+        <li>comment 1</li>
+        <li>comment 1</li>
+        <li>comment 1</li>
+        <li>comment 1</li>
+        <li>comment 1</li>
+      </ul>
+
+    </div> -->
 
 
 
@@ -55,6 +101,64 @@
       privacy = container.querySelector(".post .privacy"),
       arrowBack = container.querySelector(".audience .arrow-back");
 
+      const postBtn = document.querySelector(".post-form button");
+      postBtn.addEventListener("click", () => {
+        const content = document.querySelector(".post-form textarea").value.trim();
+        if(content && content.length !== 0) {
+          fetch("post", {
+            method: "post",
+            body: JSON.stringify({
+              "content": content
+            }),
+            headers: {
+              "content-type": "application/json"
+            }
+          })
+          .then(response => {
+            if(response.ok){
+              return response.json();
+            } else {
+              console.log("error");
+            }
+          })
+          .then(json => {
+            document.querySelectorAll(".single-post").forEach(e => e.remove());
+            let i = 0;
+            for(let o of json.data) {
+              document.querySelector("body").innerHTML += `<div id="post-${i}" class="container single-post">
+      <div class="wrapper" style="float: left;">
+        <ul class="post-actions">
+            <li style="color: #0051ff;">Chỉnh sửa</li>
+            <li style="color: red;">Xóa</li>
+          </ul>
+        <section class="post">
+          <header>Bài viết</header>
+          <div class="content">
+            <div class="details">
+              <p>${o.content}</p>
+            </div>
+          </div>
+        </section>
+        <section class="comment-form">
+          <header>Bình luận</header>
+          <form action="#">
+            <textarea placeholder="Viết bình luận..." spellcheck="false" required></textarea>
+          </form>
+        </section>
+      
+      </div>
+      <div style="clear: both;"></div>
+
+    </div>`
+              console.log(o);
+              i++;
+            }
+            
+            console.log(json);
+          });
+        }
+        
+      });
 
       privacy.addEventListener("click", () => {
         container.classList.add("active");

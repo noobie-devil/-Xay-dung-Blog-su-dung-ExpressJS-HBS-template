@@ -1,4 +1,4 @@
-// const data = require('../models/students')
+const data = require('../models/posts')
 
 
 // const getMessage = (req, res) => {
@@ -24,9 +24,20 @@
 // }
 
 const getAllPosts = (req, res) => {
-	res.render('main');
+	res.render('main', { posts: data.data});
+}
+
+const createNewPost = (req, res) => {
+	const post = {
+		content: req.body.content,
+		comments: []
+	}
+	data.data.unshift(post);
+	
+	res.status(200).json(data);
 }
 
 module.exports = {
-	getAllPosts
+	getAllPosts,
+	createNewPost
 }

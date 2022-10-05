@@ -5,7 +5,7 @@ const postController = require('../controllers/PostController')
 router.route('/')
 	.get(postController.getAllPosts);
 
-// router.route('/:id')
-// 	.get(studentsController.getMessage);
+router.route('/post')
+	.post(postController.createNewPost);
 
 module.exports = router;
