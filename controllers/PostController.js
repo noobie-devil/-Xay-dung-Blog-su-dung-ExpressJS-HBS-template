@@ -37,7 +37,14 @@ const createNewPost = (req, res) => {
 	res.status(200).json(data);
 }
 
+const deletePost = (req, res) => {
+	const postId = req.body.id;
+	data.data.splice(postId, 1);
+	res.status(200).json(data);
+}
+
 module.exports = {
 	getAllPosts,
-	createNewPost
+	createNewPost,
+	deletePost
 }

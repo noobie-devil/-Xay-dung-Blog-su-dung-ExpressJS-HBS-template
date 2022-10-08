@@ -9,106 +9,149 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
   </head>
   <body>
-    <div class="container post-form">
-      <div class="wrapper">
-        <section class="post">
-          <header>Tạo bài viết</header>
-          <form >
+    <div class="root"> 
+      <div class="container post-form">
+        <div class="wrapper">
+          <section class="post">
+            <header>Tạo bài viết</header>
+            <form action="javascript:void(0);">
+              <div class="content">
+                <div class="details">
+                  <p></p>
+                </div>
+              </div>
+              <textarea autocomplete="off" placeholder="What's on your mind?" spellcheck="false" required></textarea>
+              <button>Post</button>
+            </form>
+          </section>
+        </div>
+      </div>
+      {{#each posts}}
+      <div id="post-{{@index}}" class="container single-post" data-id="{{@index}}">
+        <div class="wrapper" style="float: left;">
+          <ul class="post-actions">
+              <li>
+                <button>Chỉnh sửa</button>
+              </li>
+              <li>
+                <button class="delete-action" style="background: red!important;">Xóa</button>
+              </li>
+          </ul>
+          <section class="post">
+            <header>Bài viết</header>
             <div class="content">
               <div class="details">
-                <p></p>
+                <p>{{this.content}}</p>
               </div>
             </div>
-            <textarea placeholder="What's on your mind?" spellcheck="false" required></textarea>
-            <button>Post</button>
-          </form>
-        </section>
-      </div>
-    </div>
-    {{#each posts}}
-    <div id="post-{{@index}}" class="container single-post">
-      <div class="wrapper" style="float: left;">
-        <ul class="post-actions">
-            <li style="color: #0051ff;">Chỉnh sửa</li>
-            <li style="color: red;">Xóa</li>
-          </ul>
-        <section class="post">
-          <header>Bài viết</header>
-          <div class="content">
-            <div class="details">
-              <p>{{this.content}}</p>
-            </div>
-          </div>
-        </section>
-        <section class="comment-form">
-          <header>Bình luận</header>
-          <form action="#">
-            <textarea placeholder="Viết bình luận..." spellcheck="false" required></textarea>
-          </form>
-        </section>
-      
-      </div>
-      <div style="clear: both;"></div>
-      {{#if this.comments}}
-      <ul class="comment-list">
-        {{#each this.comments}}
-        <li>{{this}}</li>
-        {{/each}}
-      </ul>
-
-      {{/if}}
-    </div>
+          </section>
+          <section class="comment-form">
+            <header>Bình luận</header>
+            <form action="javascript:void(0);">
+              <textarea autocomplete="off" placeholder="Viết bình luận..." spellcheck="false" required></textarea>
+            </form>
+          </section>
         
-    {{/each}}
-    <!-- <div class="container single-post">
-      <div class="wrapper" style="float: left;">
-        <ul class="post-actions">
-            <li style="color: #0051ff;">Chỉnh sửa</li>
-            <li style="color: red;">Xóa</li>
-          </ul>
-        <section class="post">
-          <header>Bài viết</header>
-          <div class="content">
-            <div class="details">
-              <p>Đây là bài viết đầu tiên</p>
-            </div>
-          </div>
-        </section>
-        <section class="comment-form">
-          <header>Bình luận</header>
-          <form action="#">
-            <textarea placeholder="Viết bình luận..." spellcheck="false" required></textarea>
-          </form>
-        </section>
-      
+        </div>
+        <div style="clear: both;"></div>
+        {{#if this.comments}}
+        <ul class="comment-list">
+          {{#each this.comments}}
+          <li>{{this}}</li>
+          {{/each}}
+        </ul>
+
+        {{/if}}
       </div>
-      <div style="clear: both;"></div>
-
-      <ul class="comment-list">
-        <li>comment 1</li>
-        <li>comment 1</li>
-        <li>comment 1</li>
-        <li>comment 1</li>
-        <li>comment 1</li>
-      </ul>
-
-    </div> -->
-
-
-
+          
+      {{/each}}
+    </div>
+    
     <script>
       const container = document.querySelector(".container"),
       privacy = container.querySelector(".post .privacy"),
       arrowBack = container.querySelector(".audience .arrow-back");
 
-      const postBtn = document.querySelector(".post-form button");
-      postBtn.addEventListener("click", () => {
-        const content = document.querySelector(".post-form textarea").value.trim();
-        if(content && content.length !== 0) {
+      createNewPostAction();
+      addEventsForDeleteAction();
+      addEventsForCommentAction();
+
+      function createNewPostAction() {
+        const postBtn = document.querySelector(".post-form button");
+        postBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          const content = document.querySelector(".post-form textarea").value.trim();
+          if(content && content.length !== 0) {
+          e.value = "";
+            fetch("post", {
+              method: "post",
+              body: JSON.stringify({
+                "content": content
+              }),
+              headers: {
+                "content-type": "application/json"
+              }
+            })
+            .then(response => {
+              if(response.ok){
+                return response.json();
+              } else {
+                console.log("error");
+              }
+            })
+            .then(json => {
+              update(json);
+            });
+              
+          }
+          
+        });
+      }
+      
+
+      function addEventsForCommentAction() {
+        commentBox = document.querySelectorAll(".comment-form textarea");
+        commentBox.forEach(el => el.addEventListener("keyup", (el) => {
+          console.log(el.keyCode);
+          if(el.keyCode == 13) {
+            const postId = el.currentTarget.closest(".single-post").getAttribute("data-id");
+            const comment = el.currentTarget.value.trim();
+            if(comment && comment.length !== 0) {
+              el.value = "";
+              fetch("comment", {
+                method: "post",
+                body: JSON.stringify({
+                  "postId": postId,
+                  "comment": comment
+                }),
+                headers: {
+                  "content-type": "application/json"
+                }
+              })
+              .then(response => {
+                if(response.ok){
+                  return response.json();
+                } else {
+                  console.log("error");
+                }
+              })
+              .then(json => {
+                update(json);
+              });  
+            }
+            
+          }
+        }));
+      }
+
+      function addEventsForDeleteAction() {
+        deleteButtons = document.querySelectorAll(".single-post button.delete-action");
+        deleteButtons.forEach(el => el.addEventListener("click", (el) => {
+          let postId = el.currentTarget.closest(".single-post").getAttribute("data-id");
           fetch("post", {
-            method: "post",
+            method: "delete",
             body: JSON.stringify({
-              "content": content
+              "id": postId
             }),
             headers: {
               "content-type": "application/json"
@@ -122,43 +165,66 @@
             }
           })
           .then(json => {
-            document.querySelectorAll(".single-post").forEach(e => e.remove());
-            let i = 0;
-            for(let o of json.data) {
-              document.querySelector("body").innerHTML += `<div id="post-${i}" class="container single-post">
-      <div class="wrapper" style="float: left;">
-        <ul class="post-actions">
-            <li style="color: #0051ff;">Chỉnh sửa</li>
-            <li style="color: red;">Xóa</li>
-          </ul>
-        <section class="post">
-          <header>Bài viết</header>
-          <div class="content">
-            <div class="details">
-              <p>${o.content}</p>
-            </div>
-          </div>
-        </section>
-        <section class="comment-form">
-          <header>Bình luận</header>
-          <form action="#">
-            <textarea placeholder="Viết bình luận..." spellcheck="false" required></textarea>
-          </form>
-        </section>
-      
-      </div>
-      <div style="clear: both;"></div>
-
-    </div>`
-              console.log(o);
-              i++;
-            }
-            
-            console.log(json);
+            update(json);
           });
+        }))
+      }
+
+      function update(json) {
+        document.querySelectorAll(".single-post").forEach(e => e.remove());
+        let i = 0;
+        for(let o of json.data) {
+          document.querySelector(".root").innerHTML += `
+          <div id="post-${i}" class="container single-post" data-id="${i}">
+            <div class="wrapper" style="float: left;">
+              <ul class="post-actions">
+                <li>
+                  <button>Chỉnh sửa</button>
+                </li>
+                <li>
+                  <button class="delete-action" style="background: red!important;">Xóa</button>
+                </li>
+              </ul>
+              <section class="post">
+                <header>Bài viết</header>
+                <div class="content">
+                  <div class="details">
+                    <p>${o.content}</p>
+                  </div>
+                </div>
+              </section>
+              <section class="comment-form">
+                <header>Bình luận</header>
+                <form action="javascript:void(0);">
+                  <textarea autocomplete="off" placeholder="Viết bình luận..." spellcheck="false" required></textarea>
+                </form>
+              </section>
+            
+            </div>
+            <div style="clear: both;"></div>
+
+          </div>`;
+
+          if(o.comments.length > 0) {
+            let commentsList = `<ul class="comment-list">`;
+            for(let comment of o.comments) {
+              commentsList += `
+                <li>${comment}</li>
+              `;
+            }
+            commentsList += `</ul>`;
+
+            document.getElementById(`post-${i}`).innerHTML += `
+                ${commentsList};
+            `;
+          }
+          i++;
         }
         
-      });
+        createNewPostAction();
+        addEventsForDeleteAction();
+        addEventsForCommentAction();
+      }
 
       privacy.addEventListener("click", () => {
         container.classList.add("active");
